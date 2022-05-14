@@ -1,3 +1,5 @@
+USE employee_db;
+
 INSERT INTO department (name)
 VALUES ("steel"),
        ("paint"),
@@ -11,9 +13,9 @@ VALUES ("welder", 70000, 1),
        ("supervisor", 85000, 4)
 
 
-INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Linda", "Belcher", 3),
-       ("bob", "belcher", 3),
-       ("jimmy", "pesto", 2),
-       ("lenny", "distephino", 1),
-       ("mort", "goldman", 3);
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
+VALUES ("Linda", "Belcher", 3, 12),
+       ("bob", "belcher", 3, 21),
+       ("jimmy", "pesto", 2, 34),
+       ("lenny", "distephino", 1, 43),
+       ("mort", "goldman", 3, 32);
