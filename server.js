@@ -3,13 +3,14 @@ const inquirer = require("inquirer");
 const mysql = require("mysql2");
 // const db = require("./db");
 const table = require("console.table");
+const { listen } = require("express/lib/application");
 
 const dbConnection = mysql.createConnection(
     {
         host: "localhost",
         port: 3306,
         user: "root",
-        // password: "",  SPECIAL PASSWORD HERE
+        password: "",
         database: 'employee_db'
     }
 )
@@ -43,10 +44,6 @@ function loadMainPrompts() {
           value: "ADD_DEPARTMENT",
         },
         {
-          name: "add role",
-          value: "ADD_ROLES",
-        },
-        {
           name: "add Employee",
           value: "ADD_EMPLOYEE",
         },
@@ -75,7 +72,7 @@ function loadMainPrompts() {
       case "ADD_DEPARTMENT":
         addDepartment();
         break;
-      case "ADD_EMPLOYEES":
+      case "ADD_EMPLOYEE":
         addEmployee();
         break;
       case "UPDATE_ROLES":
@@ -90,7 +87,7 @@ function loadMainPrompts() {
 
 function viewEmployees() {
   // acticity 12 SQL
-  const sql = `SELECT first_name FROM employees`;
+  const sql = `SELECT * FROM employees`;
   dbConnection.query(sql, function (err, res) {
     console.log(res);
     if (err) throw err;
@@ -130,32 +127,82 @@ function viewRoles() {
 
 function addDepartment() {
   inquirer
-    .prompt([
+  .prompt([
+    {
+      name: "deptName",
+      type: "input",
+      message: "Add a New Department",
+    },
+  ]).then(function (res) {
+    dbConnection.query(
+      "INSERT INTO department SET ? ",
       {
-        name: "deptName",
-        type: "input",
-        message: "Add a New Department",
+        name: res.deptName,
       },
-    ])
-    .then(function (res) {
-        dbConnection.query(
-        "INSERT INTO department SET ? ",
-        {
-          name: res.deptName,
-        },
-        function (err) {
-          if (err) throw err;
-          console.table(res);
-          loadMainPrompts();
-        }
-      );
-    });
+      function (err) {
+        if (err) throw err;
+        console.table(res);
+        loadMainPrompts();
+      }
+    );
+  });
 }
-
+  // get a list of roles
+  // get a list of employees
+  // prompt for first name last name
+  // pick a role
+  // pick an employee from list
+  // pick role from list
 function addEmployee() {
-
+  inquirer
+  .prompt([
+    {
+      type: "input",
+      name: "firstNameInput",
+      message: "Enter First Name",
+    },
+    {
+      type: "input",
+      name: "lastNameInput",
+      message: "Enter Last Name",
+    },
+    {
+      type: "input",
+      name: "roleInput",
+      message: "Enter Employee Role ID 1-5",
+    },
+    {
+      type: "input",
+      name: "managerInput",
+      message: "Enter Manager ID of 1 please",
+    },
+  ]).then(function (res) {
+    dbConnection.query(
+      "INSERT INTO employees SET ? ",
+      {
+        first_name: res.firstNameInput,
+        last_name: res.lastNameInput,
+        role_id: res.roleInput,
+        manager_id: res.managerInput,
+      },
+      function (err) {
+        if (err) throw err;
+        console.table(res);
+        loadMainPrompts();
+      }
+    );
+  });
 }
 
-function updateRole() {
+// function updateRole() {
+//   inquirer
+//   .prompt([
+//     {
+//       type: "list",
+//     }
+//   ]).then
+// }
 
+function exit() {
+  process.exit();
 }
