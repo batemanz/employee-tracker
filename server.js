@@ -1,7 +1,6 @@
 const res = require("express/lib/response");
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
-// const db = require("./db");
 const table = require("console.table");
 const { listen } = require("express/lib/application");
 
@@ -10,7 +9,7 @@ const dbConnection = mysql.createConnection(
         host: "localhost",
         port: 3306,
         user: "root",
-        password: "",
+        password: "pswrd",
         database: 'employee_db'
     }
 )
@@ -19,8 +18,6 @@ dbConnection.connect(function(err) {
     if (err) throw err;
     loadMainPrompts();
 })
-
-
 
 function loadMainPrompts() {
     inquirer
@@ -75,7 +72,7 @@ function loadMainPrompts() {
       case "ADD_EMPLOYEE":
         addEmployee();
         break;
-      case "UPDATE_ROLES":
+      case "UPDATE_ROLE":
         updateRole();
         break;
       case "EXIT":
@@ -86,22 +83,12 @@ function loadMainPrompts() {
 }
 
 function viewEmployees() {
-  // acticity 12 SQL
   const sql = `SELECT * FROM employees`;
   dbConnection.query(sql, function (err, res) {
-    console.log(res);
     if (err) throw err;
     console.log("view employees success!");
     console.table(res);
     loadMainPrompts();
-    // {
-    //     res.status(500).json({error: err.message});
-    //     return;
-    // }
-    // res.json({
-    //     message: "success",
-    //     data: rows
-    // });
   });
 }
 
@@ -141,18 +128,14 @@ function addDepartment() {
       },
       function (err) {
         if (err) throw err;
+        console.log("Add Department success!");
         console.table(res);
         loadMainPrompts();
       }
     );
   });
 }
-  // get a list of roles
-  // get a list of employees
-  // prompt for first name last name
-  // pick a role
-  // pick an employee from list
-  // pick role from list
+
 function addEmployee() {
   inquirer
   .prompt([
@@ -169,7 +152,7 @@ function addEmployee() {
     {
       type: "input",
       name: "roleInput",
-      message: "Enter Employee Role ID 1-5",
+      message: "Enter Employee Role ID #",
     },
     {
       type: "input",
@@ -187,6 +170,7 @@ function addEmployee() {
       },
       function (err) {
         if (err) throw err;
+        console.log("Add Employee success!");
         console.table(res);
         loadMainPrompts();
       }
@@ -194,14 +178,31 @@ function addEmployee() {
   });
 }
 
-// function updateRole() {
-//   inquirer
-//   .prompt([
-//     {
-//       type: "list",
-//     }
-//   ]).then
-// }
+function updateRole() {
+  inquirer
+  .prompt([
+    {
+      type: "input",
+      message: "Please Enter Employees ID # you wish to change the role of.",
+      name: "employID"
+    },
+    {
+      type: "input",
+      message: "Please Enter the New Role ID # you wish to change to (1-5)",
+      name: "updatedRole"
+    }
+  ]).then(function (res) {
+    const employIDval = res.employID;
+    const updatedRoleVal = res.updatedRole;
+    const updateQ = `UPDATE employees SET role_id = "${updatedRoleVal}" WHERE id = "${employIDval}"`;
+    dbConnection.query(updateQ, function (err, res) {
+      if (err) throw err;
+      console.log("Update Employee Role success!");
+      console.table(res);
+      loadMainPrompts();
+    });
+  });
+}
 
 function exit() {
   process.exit();
